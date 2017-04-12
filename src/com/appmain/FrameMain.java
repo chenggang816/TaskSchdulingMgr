@@ -42,6 +42,7 @@ public class FrameMain extends JFrame{
 				ipList.add(NetHelper.getLocalHostIp());
 				ipList.addAll(NetHelper.getIPs());
 				Collections.sort(ipList);
+				model.setRowCount(0);
 				for(int i=0;i<ipList.size();i++){
 					String ip = ipList.get(i);
 					model.addRow(new Object[]{i + 1,ip,"δ֪","δ֪","δ֪"});
