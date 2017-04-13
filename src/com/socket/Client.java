@@ -39,7 +39,8 @@ public class Client {
 	}
 	
 	public String send(int flag,String msg){
-		connect();
+		if(!connect())
+			return null;
 		Writer writer = null;
 		Reader reader = null;
 		try {
@@ -66,7 +67,7 @@ public class Client {
 			}  
 			return sb.toString();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}  finally{
 			try {
 				writer.close();

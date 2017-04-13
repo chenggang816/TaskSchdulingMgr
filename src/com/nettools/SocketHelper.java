@@ -40,10 +40,12 @@ public class SocketHelper {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					if(client.sendHello() == null){
+					String strReply = client.sendHello();
+					if(strReply == null){
 						map.put(ip, false);
 					}else{
 						map.put(ip, true);
+						System.out.println(strReply);
 					}
 					monitor.reduceCount(1);
 					if(monitor.getCount() <= 0){
