@@ -3,12 +3,15 @@ package com.nettools;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import com.socket.Client;
-
-
+import com.manager.Client;
+import com.manager.msg.MsgHandler;
+import com.manager.msg.MsgHandlerFactory;
+import com.manager.msg.UnresolvedMsgHandler;
 
 public class SocketHelper {
 	class Monitor{
@@ -19,7 +22,7 @@ public class SocketHelper {
 		synchronized public void reduceCount(int count){
 			this.count -= count;
 		}
-		public int getCount(){
+		synchronized public int getCount(){
 			System.out.println(this.count);
 			return this.count;
 		}
@@ -31,12 +34,14 @@ public class SocketHelper {
 	public static Map<String, Boolean> tryCommunicate(List<String> ips,final int port){
 		final Map<String,Boolean> map = new HashMap<String,Boolean>();
 		final Monitor monitor = new SocketHelper().new Monitor(ips.size());
+		final Set<String> ipSet = new HashSet<String>(ips);
 		for(final String ip:ips){
 			new Thread(){
 				public void run(){
 					Client client = null;
 					try {
 						client = new Client(ip,port);
+						this.setName(ip);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -44,11 +49,23 @@ public class SocketHelper {
 					if(strReply == null){
 						map.put(ip, false);
 					}else{
-						map.put(ip, true);
+						MsgHandler handler = MsgHandlerFactory.getMsgHandler(strReply);
+						if(handler instanceof UnresolvedMsgHandler){
+							map.put(ip, false);
+						}else{
+							String strResult = handler.handle();
+							if(strResult != null){
+								client.sendMsg(strResult);
+							}
+							map.put(ip, true);
+						}
+						
 						System.out.println(strReply);
 					}
 					monitor.reduceCount(1);
-					if(monitor.getCount() <= 0){
+					ipSet.remove(ip);
+					System.out.print(this.getName() + ":");
+					if(monitor.getCount() <= 1){
 						synchronized(monitor){
 							monitor.notify();
 						}
@@ -62,6 +79,9 @@ public class SocketHelper {
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+		for(String ip:ipSet){
+			System.out.println("没有退出的线程:" + ip);
 		}
 		return map;
 	}

@@ -1,12 +1,15 @@
-package com.socket;
+package com.manager;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import org.json.simple.JSONObject;
 
 public class Client {
 	Socket client = null;
@@ -38,15 +41,14 @@ public class Client {
 		}
 	}
 	
-	public String send(int flag,String msg){
+	public String send(String strMsg){
 		if(!connect())
 			return null;
 		Writer writer = null;
 		Reader reader = null;
 		try {
 			writer = new OutputStreamWriter(client.getOutputStream());
-			writer.write(flag);
-			writer.write(msg);
+			writer.write(strMsg);
 			writer.write("eof");  
 			writer.flush();//写完后要记得flush 
 			
@@ -67,7 +69,8 @@ public class Client {
 			}  
 			return sb.toString();
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
+			System.out.println("异常主机ip:" + host);
 		}  finally{
 			try {
 				writer.close();
@@ -80,9 +83,18 @@ public class Client {
 		return null;
 	}
 	public String sendHello(){
-		return this.send(0,"HELLO");
+		JSONObject json = new JSONObject();
+		json.put("type", "HELLO");
+		StringWriter out = new StringWriter();
+        try {
+			json.writeJSONString(out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        String jsonText = out.toString();
+		return this.send(jsonText);
 	}
 	public String sendMsg(String msg){
-		return this.send(1, msg);
+		return this.send(msg);
 	}
 }

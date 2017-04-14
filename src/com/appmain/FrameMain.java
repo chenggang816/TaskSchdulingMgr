@@ -93,7 +93,7 @@ public class FrameMain extends JFrame{
 					public void run(){
 						String strBtnTxt = btnTestService.getText();
 						btnTestService.setText("正在测试服务");
-						btnTestService.setEnabled(false);
+//						btnTestService.setEnabled(false);
 						Map<String, Boolean> map;
 						map = SocketHelper.tryCommunicate(ipList, 8000);
 						for(int i = 0;i < ipList.size();i++){
