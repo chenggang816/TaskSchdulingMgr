@@ -1,8 +1,10 @@
 package com.manager;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -12,7 +14,7 @@ import java.net.UnknownHostException;
 import org.json.simple.JSONObject;
 
 public class Client {
-	Socket client = null;
+	Socket socket = null;
 	String host = null;
 	int port;
 	public Client(String host,int port) throws UnknownHostException, IOException {
@@ -23,7 +25,7 @@ public class Client {
 	public boolean connect(){
 		//与服务端建立连接  
 		try {
-			client = new Socket(host, port);
+			socket = new Socket(host, port);
 			return true;
 		} catch (UnknownHostException e) {
 			return false;
@@ -32,10 +34,10 @@ public class Client {
 		}  
 	}
 	public void close(){
-		if(client == null)
+		if(socket == null)
 			return;
 		try {
-			client.close();
+			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -44,37 +46,27 @@ public class Client {
 	public String send(String strMsg){
 		if(!connect())
 			return null;
-		Writer writer = null;
-		Reader reader = null;
+		PrintWriter out = null;
+		BufferedReader in = null;
 		try {
-			writer = new OutputStreamWriter(client.getOutputStream());
-			writer.write(strMsg);
-			writer.write("eof");  
-			writer.flush();//写完后要记得flush 
-			
+			out = new PrintWriter(socket.getOutputStream(),true);
+			out.println(strMsg);
+			 
 			//写完以后进行读操作  
-			reader = new InputStreamReader(client.getInputStream());  
-			char chars[] = new char[64];  
-			int len;  
-			StringBuilder sb = new StringBuilder();  
-			String temp;  
-			int index;  
-			while ((len=reader.read(chars)) != -1) {  
-				temp = new String(chars, 0, len);  
-				if ((index = temp.indexOf("eof")) != -1) {//遇到eof时就结束接收  
-					sb.append(temp.substring(0, index));  
-					break;  
-				}  
-				sb.append(temp);  
-			}  
-			return sb.toString();
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			String line ;
+			while((line= in.readLine()) != null){
+				System.out.println("Server:" + line);
+				return line;
+			}	
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("异常主机ip:" + host);
 		}  finally{
 			try {
-				writer.close();
-				reader.close(); 
+				out.close();
+				in.close(); 
 				close();
 			} catch (Exception e) {
 				return null;
@@ -85,6 +77,7 @@ public class Client {
 	public String sendHello(){
 		JSONObject json = new JSONObject();
 		json.put("type", "HELLO");
+		json.put("content", null);
 		StringWriter out = new StringWriter();
         try {
 			json.writeJSONString(out);

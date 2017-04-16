@@ -12,8 +12,8 @@ public class MsgHandlerFactory {
 			msg = (JSONObject)parser.parse(strMsg);
 			String msgType = msg.get("type").toString();
 			switch(msgType){
-			case "HELLO":
-				return new HelloMsgHandler();
+			case "REPLY":
+				return new ReplyMsgHandler();
 			default:
 				return new UnresolvedMsgHandler();
 			}

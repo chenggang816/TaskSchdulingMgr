@@ -11,6 +11,7 @@ import java.util.Set;
 import com.manager.Client;
 import com.manager.msg.MsgHandler;
 import com.manager.msg.MsgHandlerFactory;
+import com.manager.msg.ReplyMsgHandler;
 import com.manager.msg.UnresolvedMsgHandler;
 
 public class SocketHelper {
@@ -50,14 +51,10 @@ public class SocketHelper {
 						map.put(ip, false);
 					}else{
 						MsgHandler handler = MsgHandlerFactory.getMsgHandler(strReply);
-						if(handler instanceof UnresolvedMsgHandler){
-							map.put(ip, false);
-						}else{
-							String strResult = handler.handle();
-							if(strResult != null){
-								client.sendMsg(strResult);
-							}
+						if(handler instanceof ReplyMsgHandler){
 							map.put(ip, true);
+						}else{
+							map.put(ip, false);
 						}
 						
 						System.out.println(strReply);
@@ -65,7 +62,7 @@ public class SocketHelper {
 					monitor.reduceCount(1);
 					ipSet.remove(ip);
 					System.out.print(this.getName() + ":");
-					if(monitor.getCount() <= 1){
+					if(monitor.getCount() <= 0){
 						synchronized(monitor){
 							monitor.notify();
 						}
