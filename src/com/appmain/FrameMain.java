@@ -3,6 +3,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -16,21 +17,24 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import com.nettools.NetHelper;
-import com.nettools.SocketHelper;
+import com.tools.NetHelper;
+import com.tools.SocketHelper;
 
 public class FrameMain extends JFrame{
 	JButton btnGainAllIp,btnGainHostNames;
-	JButton btnTestService;
+	JButton btnTestService,btnTaskCheck,btnTaskUpdate;
 	JPanel panelTop;
 	JTable table;
 	DefaultTableModel model;
 
 	public FrameMain() {
 		initialize();
+		WorkFlow.updateTasksJsonFile();
 	}
 	
-	private void initialize() {
+	
+	
+ 	private void initialize() {
 		final List<String> ipList = new ArrayList<String>();
 		panelTop = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		
@@ -108,7 +112,30 @@ public class FrameMain extends JFrame{
 			}
 		});
 		
-		model = new DefaultTableModel(new String[]{"序号","IP","主机名","服务是否开启","任务执行情况"},0){
+		btnTaskCheck = new JButton("检查任务更新");
+		panelTop.add(btnTaskCheck);
+		btnTaskCheck.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(ipList.isEmpty()) return;
+				boolean[] b = WorkFlow.checkUpdateState(ipList);
+				for(int i = 0; i < ipList.size(); i++){
+					boolean serviceOpen = model.getValueAt(i, 3).toString().equals("是");
+					model.setValueAt(serviceOpen?(b[i]?"已最新":"需要更新"):"", i, 4);
+				}
+			}
+		});
+		
+		btnTaskUpdate = new JButton("任务更新");
+		panelTop.add(btnTaskUpdate);
+		btnTaskUpdate.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(ipList.isEmpty()) return;
+			}
+		});
+		
+		model = new DefaultTableModel(new String[]{"序号","IP","主机名","服务是否开启","任务更新"},0){
 			public boolean isCellEditable(int r,int c){
 				return false;
 			}
@@ -130,8 +157,8 @@ public class FrameMain extends JFrame{
 		this.add(new JScrollPane(table),BorderLayout.CENTER);
 		
 		this.setTitle("任务调度管理");
-		this.setLocation(200,100);
-		this.setSize(800,500);
+		this.setLocation(150,100);
+		this.setSize(1000,600);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		
 		this.setVisible(true);
 	}

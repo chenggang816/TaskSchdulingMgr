@@ -1,4 +1,4 @@
-package com.nettools;
+package com.tools;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
