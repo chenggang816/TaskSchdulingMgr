@@ -127,7 +127,7 @@ public class NetHelper{
 					System.out.println(ip + ":" + hostname);
 					map.put(ip,hostname);
 				}else {
-					map.put(ip,ip);
+					map.put(ip,""); 		//没有获取到主机名，填充空字符串
 				}
 				System.out.println("线程" + this.getName() + "已结束退出");
 				monitorObj.addFinishedIpNum(1);
@@ -160,7 +160,9 @@ public class NetHelper{
 	private static String getHostNameByIp(String ip) {
 		try {
 			InetAddress inetAddress = InetAddress.getByName(ip);
-			return inetAddress.getHostName();
+			String hostName = inetAddress.getHostName();
+			if(hostName.equals(ip)) return null;
+			return hostName;
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

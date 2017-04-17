@@ -95,7 +95,7 @@ public class FrameMain extends JFrame{
 						btnTestService.setText("正在测试服务");
 						btnTestService.setEnabled(false);
 						Map<String, Boolean> map;
-						map = SocketHelper.tryCommunicate(ipList, 8000);
+						map = SocketHelper.tryCommunicate(ipList);
 						for(int i = 0;i < ipList.size();i++){
 							String r = map.get(ipList.get(i)) ? "是":"否";
 							model.setValueAt(r, i, 3);

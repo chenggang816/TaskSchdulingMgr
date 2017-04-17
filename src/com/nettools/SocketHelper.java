@@ -15,6 +15,8 @@ import com.manager.msg.ReplyMsgHandler;
 import com.manager.msg.UnresolvedMsgHandler;
 
 public class SocketHelper {
+	public static final int port = 8899;
+	
 	class Monitor{
 		public Monitor(int count){
 			this.count = count;
@@ -32,7 +34,7 @@ public class SocketHelper {
 	 * 测试ips里的每个ip对应port端口的服务是否开启
 	 * 返回的Map的key为ip,value为true表示成功开启
 	 */
-	public static Map<String, Boolean> tryCommunicate(List<String> ips,final int port){
+	private static Map<String, Boolean> tryCommunicate(List<String> ips,final int port){
 		final Map<String,Boolean> map = new HashMap<String,Boolean>();
 		final Monitor monitor = new SocketHelper().new Monitor(ips.size());
 		final Set<String> ipSet = new HashSet<String>(ips);
@@ -81,5 +83,12 @@ public class SocketHelper {
 			System.out.println("没有退出的线程:" + ip);
 		}
 		return map;
+	}
+
+	/*
+	 * 使用本类中的port端口
+	 */
+	public static Map<String, Boolean> tryCommunicate(List<String> ips){
+		return tryCommunicate(ips,port);
 	}
 }
