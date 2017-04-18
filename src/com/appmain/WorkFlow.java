@@ -7,7 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import com.manager.Client;
 import com.tools.FileHelper;
@@ -29,7 +33,7 @@ public class WorkFlow {
 	}
 	
 	private static String getTasksString(){
-		File fileTasks = FileHelper.GetTasksJsonFile();
+		File fileTasks = FileMgr.GetTaskAllJsonFile();
 		if(fileTasks == null) return null;
 		try {
 			BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(fileTasks)));
@@ -44,8 +48,14 @@ public class WorkFlow {
 		return null;
 	}
 	
+	/*
+	 * 更新tasks.json文件，这是一个临时文件，存放全部任务信息
+	 */
 	public static void updateTasksJsonFile(){
-		File fileTasks = FileHelper.GetTasksJsonFile();
-		
+		File fileTasks = FileMgr.GetTaskAllJsonFile();
+		String tasksJSONString = JSONMgr.getTasksJsonStr();
+		FileHelper.WriteToFile(fileTasks, tasksJSONString);
 	}
+	
+
 }

@@ -1,4 +1,4 @@
-package com.tools;
+package com.manager;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.manager.Client;
 import com.manager.msg.MsgHandler;
 import com.manager.msg.MsgHandlerFactory;
 import com.manager.msg.ReplyMsgHandler;

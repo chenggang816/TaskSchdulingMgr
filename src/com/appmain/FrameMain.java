@@ -1,6 +1,7 @@
 package com.appmain;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -17,10 +18,13 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import com.manager.SocketHelper;
 import com.tools.NetHelper;
-import com.tools.SocketHelper;
 
 public class FrameMain extends JFrame{
+	JMenuBar menuBar;
+	JMenu menuFile;
+	JMenuItem menuItemLoadConfigFile,menuItemEditConfigFile;
 	JButton btnGainAllIp,btnGainHostNames;
 	JButton btnTestService,btnTaskCheck,btnTaskUpdate;
 	JPanel panelTop;
@@ -36,7 +40,8 @@ public class FrameMain extends JFrame{
 	
  	private void initialize() {
 		final List<String> ipList = new ArrayList<String>();
-		panelTop = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		panelTop = new JPanel(new GridLayout(9, 1, 35, 5));
+		panelTop.setSize(200, 400);
 		
 		btnGainAllIp = new JButton("获取局域网所有IP");
 		btnGainAllIp.addActionListener(new ActionListener(){
@@ -49,7 +54,7 @@ public class FrameMain extends JFrame{
 				model.setRowCount(0);
 				for(int i=0;i<ipList.size();i++){
 					String ip = ipList.get(i);
-					model.addRow(new Object[]{i + 1,ip,"未知","未知","未知"});
+					model.addRow(new Object[]{i + 1,ip,SocketHelper.port,"未知","未知","未知"});
 				}
 			}
 		});
@@ -71,7 +76,7 @@ public class FrameMain extends JFrame{
 							Map<String, String> mapIpHostNames = NetHelper.getHostnames(ipList);
 							for(int i=0;i<ipList.size();i++){
 								String ip = ipList.get(i);
-								model.setValueAt(mapIpHostNames.get(ip), i, 2);
+								model.setValueAt(mapIpHostNames.get(ip), i, 3);
 							}
 						} catch (InterruptedException e1) {
 							e1.printStackTrace();
@@ -102,7 +107,7 @@ public class FrameMain extends JFrame{
 						map = SocketHelper.tryCommunicate(ipList);
 						for(int i = 0;i < ipList.size();i++){
 							String r = map.get(ipList.get(i)) ? "是":"否";
-							model.setValueAt(r, i, 3);
+							model.setValueAt(r, i, 4);
 						}
 						btnTestService.setText(strBtnTxt);
 						btnTestService.setEnabled(true);
@@ -121,7 +126,7 @@ public class FrameMain extends JFrame{
 				boolean[] b = WorkFlow.checkUpdateState(ipList);
 				for(int i = 0; i < ipList.size(); i++){
 					boolean serviceOpen = model.getValueAt(i, 3).toString().equals("是");
-					model.setValueAt(serviceOpen?(b[i]?"已最新":"需要更新"):"", i, 4);
+					model.setValueAt(serviceOpen?(b[i]?"已最新":"需要更新"):"", i, 5);
 				}
 			}
 		});
@@ -135,9 +140,31 @@ public class FrameMain extends JFrame{
 			}
 		});
 		
-		model = new DefaultTableModel(new String[]{"序号","IP","主机名","服务是否开启","任务更新"},0){
+		menuBar = new JMenuBar();
+		menuFile = new JMenu("文件");
+		menuBar.add(menuFile);
+		
+		menuItemLoadConfigFile = new JMenuItem("从配置文件中加载主机");
+		menuFile.add(menuItemLoadConfigFile);
+		menuItemLoadConfigFile.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+
+		menuItemEditConfigFile = new JMenuItem("编辑配置文件...");
+		menuFile.add(menuItemEditConfigFile);
+		menuItemEditConfigFile.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		
+		model = new DefaultTableModel(new String[]{"序号","IP","端口号","主机名","服务是否开启","任务更新"},0){
 			public boolean isCellEditable(int r,int c){
-				return false;
+				return true;
 			}
 		};
 		
@@ -153,7 +180,8 @@ public class FrameMain extends JFrame{
             col.setCellRenderer(d);  
         }  
 		
-		this.add(panelTop,BorderLayout.NORTH);
+		this.add(menuBar,BorderLayout.NORTH);
+        this.add(panelTop,BorderLayout.EAST);
 		this.add(new JScrollPane(table),BorderLayout.CENTER);
 		
 		this.setTitle("任务调度管理");

@@ -13,6 +13,9 @@ import java.net.UnknownHostException;
 
 import org.json.simple.JSONObject;
 
+import com.appmain.JSONMgr;
+import com.manager.msg.MsgCreator;
+
 public class Client {
 	Socket socket = null;
 	String host = null;
@@ -75,16 +78,7 @@ public class Client {
 		return null;
 	}
 	public String sendHello(){
-		JSONObject json = new JSONObject();
-		json.put("type", "HELLO");
-		json.put("content", null);
-		StringWriter out = new StringWriter();
-        try {
-			json.writeJSONString(out);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-        String jsonText = out.toString();
+		String jsonText = MsgCreator.createHelloMsg();
 		return this.send(jsonText);
 	}
 	public String sendMsg(String msg){

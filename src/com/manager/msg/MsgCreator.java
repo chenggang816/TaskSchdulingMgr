@@ -5,18 +5,14 @@ import java.io.StringWriter;
 
 import org.json.simple.JSONObject;
 
+import com.appmain.JSONMgr;
+
 public class MsgCreator {
-	public static String createTaskStateMsg(String tasksStr){
-		JSONObject obj = new JSONObject();
-		obj.put("type", "TASK_STATE");
-		obj.put("content", tasksStr);
-		StringWriter out = new StringWriter();
-		try {
-			obj.writeJSONString(out);
-			return out.toString();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+	public static String createTaskStateMsg(String taskStateInfoStr){
+		return JSONMgr.getReplyMsgJsonStr(taskStateInfoStr);
+	}
+
+	public static String createHelloMsg(){
+		return JSONMgr.getHelloMsgJsonStr();
 	}
 }
