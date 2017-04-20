@@ -1,10 +1,14 @@
 package com.manager.msg;
 
 public class TaskInfoReplyHandler extends MsgHandler{
-
+	private String content;
+	public TaskInfoReplyHandler(String content) {
+		this.content = content;
+	}
+	
 	@Override
 	public String handle() {
-		throw new UnsupportedOperationException();
+		return content;
 	}
 
 }

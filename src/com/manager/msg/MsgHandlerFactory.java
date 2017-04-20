@@ -14,6 +14,8 @@ public class MsgHandlerFactory {
 			switch(msgType){
 			case "REPLY":
 				return new ReplyMsgHandler();
+			case "TASK_INFO_REPLY":
+				return new TaskInfoReplyHandler(msg.get("content").toString());
 			default:
 				return new UnresolvedMsgHandler();
 			}
