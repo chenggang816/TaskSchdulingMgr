@@ -77,11 +77,4 @@ public class Client {
 		}
 		return null;
 	}
-	public String sendHello(){
-		String jsonText = MsgCreator.createHelloMsg();
-		return this.send(jsonText);
-	}
-	public String sendMsg(String msg){
-		return this.send(msg);
-	}
 }

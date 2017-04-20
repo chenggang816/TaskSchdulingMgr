@@ -8,8 +8,8 @@ import org.json.simple.JSONObject;
 import com.appmain.JSONMgr;
 
 public class MsgCreator {
-	public static String createTaskStateMsg(String taskStateInfoStr){
-		return JSONMgr.getReplyMsgJsonStr(taskStateInfoStr);
+	public static String createTaskInfoMsg(String taskStateInfoStr){
+		return JSONMgr.getTaskInfoMsgJsonStr(taskStateInfoStr);
 	}
 
 	public static String createHelloMsg(){

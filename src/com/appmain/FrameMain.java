@@ -24,22 +24,21 @@ import com.tools.NetHelper;
 public class FrameMain extends JFrame{
 	JMenuBar menuBar;
 	JMenu menuFile;
-	JMenuItem menuItemLoadConfigFile,menuItemEditConfigFile;
+	JMenuItem menuItemLoadConfigFile,menuItemEditConfigFile,menuItemViewConfigFile;
 	JButton btnGainAllIp,btnGainHostNames;
-	JButton btnTestService,btnTaskCheck,btnTaskUpdate;
+	JButton btnTestService,btnCheckTaskUpdate,btnTaskUpdate;
 	JPanel panelTop;
 	JTable table;
-	DefaultTableModel model;
+	
+	WorkFlow workFlow = new WorkFlow();
 
 	public FrameMain() {
 		initialize();
-		WorkFlow.updateTasksJsonFile();
 	}
 	
 	
 	
  	private void initialize() {
-		final List<String> ipList = new ArrayList<String>();
 		panelTop = new JPanel(new GridLayout(9, 1, 35, 5));
 		panelTop.setSize(200, 400);
 		
@@ -47,15 +46,7 @@ public class FrameMain extends JFrame{
 		btnGainAllIp.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ipList.clear();
-				ipList.add(NetHelper.getLocalHostIp());
-				ipList.addAll(NetHelper.getIPs());
-				Collections.sort(ipList);
-				model.setRowCount(0);
-				for(int i=0;i<ipList.size();i++){
-					String ip = ipList.get(i);
-					model.addRow(new Object[]{i + 1,ip,SocketHelper.port,"未知","未知","未知"});
-				}
+				workFlow.doGainAllIp();
 			}
 		});
 		panelTop.add(btnGainAllIp);
@@ -65,7 +56,7 @@ public class FrameMain extends JFrame{
 		btnGainHostNames.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(ipList.size() <= 0){
+				if(!workFlow.canWork()){
 					return;
 				}
 				new Thread(){
@@ -73,11 +64,7 @@ public class FrameMain extends JFrame{
 						try {
 							btnGainHostNames.setText("正在获取主机名");
 							btnGainHostNames.setEnabled(false);
-							Map<String, String> mapIpHostNames = NetHelper.getHostnames(ipList);
-							for(int i=0;i<ipList.size();i++){
-								String ip = ipList.get(i);
-								model.setValueAt(mapIpHostNames.get(ip), i, 3);
-							}
+							workFlow.doGainHostNames();
 						} catch (InterruptedException e1) {
 							e1.printStackTrace();
 						}finally{
@@ -95,7 +82,7 @@ public class FrameMain extends JFrame{
 		btnTestService.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(ipList.size() <= 0){
+				if(!workFlow.canWork()){
 					return;
 				}
 				new Thread(){
@@ -103,12 +90,7 @@ public class FrameMain extends JFrame{
 						String strBtnTxt = btnTestService.getText();
 						btnTestService.setText("正在测试服务");
 						btnTestService.setEnabled(false);
-						Map<String, Boolean> map;
-						map = SocketHelper.tryCommunicate(ipList);
-						for(int i = 0;i < ipList.size();i++){
-							String r = map.get(ipList.get(i)) ? "是":"否";
-							model.setValueAt(r, i, 4);
-						}
+						workFlow.doTestService();
 						btnTestService.setText(strBtnTxt);
 						btnTestService.setEnabled(true);
 						System.out.println("服务测试完毕");
@@ -117,17 +99,12 @@ public class FrameMain extends JFrame{
 			}
 		});
 		
-		btnTaskCheck = new JButton("检查任务更新");
-		panelTop.add(btnTaskCheck);
-		btnTaskCheck.addActionListener(new ActionListener() {
+		btnCheckTaskUpdate = new JButton("检查任务更新");
+		panelTop.add(btnCheckTaskUpdate);
+		btnCheckTaskUpdate.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(ipList.isEmpty()) return;
-				boolean[] b = WorkFlow.checkUpdateState(ipList);
-				for(int i = 0; i < ipList.size(); i++){
-					boolean serviceOpen = model.getValueAt(i, 3).toString().equals("是");
-					model.setValueAt(serviceOpen?(b[i]?"已最新":"需要更新"):"", i, 5);
-				}
+				workFlow.doCheckTaskUpdate();
 			}
 		});
 		
@@ -136,7 +113,8 @@ public class FrameMain extends JFrame{
 		btnTaskUpdate.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(ipList.isEmpty()) return;
+				if(!workFlow.canWork()) return;
+				workFlow.doTaskUpdate();
 			}
 		});
 		
@@ -149,7 +127,7 @@ public class FrameMain extends JFrame{
 		menuItemLoadConfigFile.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				workFlow.doLoadHostsFromConfig();
 			}
 		});
 
@@ -158,17 +136,20 @@ public class FrameMain extends JFrame{
 		menuItemEditConfigFile.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				workFlow.doEditConfigFile();
 			}
 		});
 		
-		model = new DefaultTableModel(new String[]{"序号","IP","端口号","主机名","服务是否开启","任务更新"},0){
-			public boolean isCellEditable(int r,int c){
-				return true;
+		menuItemViewConfigFile = new JMenuItem("查看配置文件...");
+		menuFile.add(menuItemViewConfigFile);
+		menuItemViewConfigFile.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				workFlow.doViewConfigFile();
 			}
-		};
+		});
 		
-		table = new JTable(model);
+		table = new JTable(workFlow.getTabelModel());
 		table.setRowHeight(45);		
 		//对其方式设置  
         DefaultTableCellRenderer d = new DefaultTableCellRenderer();            

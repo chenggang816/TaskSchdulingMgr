@@ -14,7 +14,7 @@ public class JSONMgr {
 	 * 获取包含所有任务信息的Json对象
 	 */
 	public static JSONObject getTasksJsonObj(){
-		File tasksDir = FileMgr.GetTaskDir();
+		File tasksDir = FileMgr.getTaskDir();
 		File[] tasks = tasksDir.listFiles();
 		JSONArray tasksJsonArray = new JSONArray();
 		for(File task:tasks){
@@ -36,10 +36,10 @@ public class JSONMgr {
 		return toJSONString(getTasksJsonObj());
 	}
 	
-	public static String getReplyMsgJsonStr(String taskStateInfoStr){
+	public static String getTaskInfoMsgJsonStr(String taskInfoStr){
 		JSONObject obj = new JSONObject();
-		obj.put("type", "TASK_STATE");
-		obj.put("content", taskStateInfoStr);
+		obj.put("type", "TASK_INFO");
+		obj.put("content", taskInfoStr);
 		return toJSONString(obj);
 	}
 	

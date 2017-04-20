@@ -1,51 +1,41 @@
 package com.appmain;
 
 import java.io.File;
-import java.io.IOException;
+
+import com.tools.FileHelper;
 
 public class FileMgr {
-
 	/*
 	 * 获取data文件夹的File对象
 	 */
-	public static File GetDataDir(){
-		File dirData = new File("data");
-		if(!dirData.exists()) dirData.mkdir();
-		if(!dirData.isDirectory()) return null;
-		return dirData;
+	public static File getDataDir(){
+		return FileHelper.getDir("data");
 	}
 
 	/*
 	 * 获取tasks.json的File对象
 	 */
-	public static File GetTaskAllJsonFile(){
-		String fileName = "TaskAll.json";
-		File dirData = GetDataDir();
-		if(dirData == null) return null;
-		for(File fileTasks:dirData.listFiles()){
-			if(fileTasks.getName().equals(fileName)){
-				return fileTasks;
-			}
-		}
-		File fileNew = new File(dirData, fileName);
-		try {
-			fileNew.createNewFile();
-			return fileNew;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+	public static File getTaskAllJsonFile(){
+		return FileHelper.getFile(getDataDir(),"TaskAll.json");
 	}
 
 	/*
-	 * 获取data/task文件夹的File对象
+	 * 获取data/task目录的File对象
 	 */
-	public static File GetTaskDir(){
-		File dirData = GetDataDir();
-		if(dirData == null) return null;
-		File dirTask = new File(dirData,"task");
-		if(!dirTask.exists()) dirTask.mkdir();
-		return dirTask;
+	public static File getTaskDir(){
+		return FileHelper.getDir(getDataDir(),"task");
 	}
 
+	/*
+	 * 获取config文件夹
+	 */
+	public static File getConfigDir(){
+		return FileHelper.getDir("config");
+	}
+	/*
+	 * 获取配置文件
+	 */
+	public static File getConfigFile(){
+		return FileHelper.getFile(getConfigDir(),"app.conf");
+	}
 }
