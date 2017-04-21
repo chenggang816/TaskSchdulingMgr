@@ -46,8 +46,9 @@ public class JSONMgr {
 	/*
 	 * 获取Hello消息的Json字符串
 	 */
-	public static String getHelloMsgJsonStr(){
+	public static String getHelloMsgJsonStr(String ip){
 		JSONObject json = new JSONObject();
+		json.put("ip", ip);
 		json.put("type", "HELLO");
 		json.put("content", null);
 		return toJSONString(json);

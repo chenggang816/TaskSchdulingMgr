@@ -12,7 +12,7 @@ public class MsgCreator {
 		return JSONMgr.getTaskInfoMsgJsonStr(taskStateInfoStr);
 	}
 
-	public static String createHelloMsg(){
-		return JSONMgr.getHelloMsgJsonStr();
+	public static String createHelloMsg(String ip){
+		return JSONMgr.getHelloMsgJsonStr(ip);
 	}
 }

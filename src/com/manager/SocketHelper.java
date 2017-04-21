@@ -48,7 +48,7 @@ public class SocketHelper {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					String strReply = client.send(MsgCreator.createHelloMsg());
+					String strReply = client.send(MsgCreator.createHelloMsg(ipp.getIp()));
 					if(strReply == null){
 						map.put(ipp, null);
 					}else{
