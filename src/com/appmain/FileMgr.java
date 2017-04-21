@@ -38,4 +38,13 @@ public class FileMgr {
 	public static File getConfigFile(){
 		return FileHelper.getFile(getConfigDir(),"app.conf");
 	}
+
+	public static File getClientDir(){
+		return FileHelper.getDir(getDataDir(),"client");
+	}
+	
+	public static File getClientFile(String ip,String port) {
+		String fileName = ip + ":" + port;
+		return FileHelper.getFile(getClientDir(), fileName);
+	}
 }

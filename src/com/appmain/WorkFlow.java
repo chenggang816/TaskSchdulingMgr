@@ -110,7 +110,7 @@ public class WorkFlow {
 		if(ipPortPairList.isEmpty()) return;
 		boolean[] b = checkUpdateState(ipPortPairList);
 		for(int i = 0; i < ipPortPairList.size(); i++){
-			boolean serviceOpen = model.getValueAt(i, 3).toString().equals("是");
+			boolean serviceOpen = model.getValueAt(i, 4).toString().equals("是");
 			model.setValueAt(serviceOpen?(b[i]?"已最新":"需要更新"):"无服务", i, 5);
 		}
 	}

@@ -54,7 +54,8 @@ public class Client {
 		try {
 			out = new PrintWriter(socket.getOutputStream(),true);
 			out.println(strMsg);
-			 
+			socket.shutdownOutput();
+			
 			//写完以后进行读操作  
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			String line ;

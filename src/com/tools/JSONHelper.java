@@ -1,5 +1,6 @@
 package com.tools;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 
@@ -31,5 +32,11 @@ public class JSONHelper {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static void saveJSONFile(JSONObject json,File file){
+		if(json == null || file == null || !file.exists()) throw new RuntimeException("±£´æJSONÎÄ¼þÊ§°Ü");
+		String str = toJSONString(json);
+		FileHelper.WriteToFile(file, str);
 	}
 }
