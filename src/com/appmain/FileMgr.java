@@ -44,7 +44,7 @@ public class FileMgr {
 	}
 	
 	public static File getClientFile(String ip,String port) {
-		String fileName = ip + ":" + port;
+		String fileName = ip + "-" + port;
 		return FileHelper.getFile(getClientDir(), fileName);
 	}
 }

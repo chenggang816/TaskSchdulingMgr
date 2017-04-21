@@ -41,6 +41,9 @@ public class WorkFlow {
 	 */
 	{
 		updateTasksJsonFile();
+		doLoadHostsFromConfig();
+		doTestService();
+//		doCheckTaskUpdate();
 	}
 	
 	public boolean canWork(){
