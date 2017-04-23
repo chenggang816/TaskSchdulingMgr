@@ -7,6 +7,9 @@ import java.io.StringWriter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.tools.FileHelper;
+import com.tools.JSONHelper;
+
 import static com.tools.JSONHelper.toJSONString;
 
 public class JSONMgr {
@@ -19,8 +22,14 @@ public class JSONMgr {
 		JSONArray tasksJsonArray = new JSONArray();
 		for(File task:tasks){
 			if(task.isFile()) continue;
+			
+			File conf = FileMgr.getTaskConfigFile(task);
+			TaskInfo taskInfo = new TaskInfo();
+			taskInfo.parseJSON(FileHelper.ReadAllFromFile(conf));
+			
 			JSONObject theTask= new JSONObject();
 			theTask.put("taskname", task.getName());
+			theTask.put("version", taskInfo.getVersion());
 			tasksJsonArray.add(theTask);
 		}
 		
@@ -34,23 +43,5 @@ public class JSONMgr {
 	 */
 	public static String getTasksJsonStr(){
 		return toJSONString(getTasksJsonObj());
-	}
-	
-	public static String getTaskInfoMsgJsonStr(String taskInfoStr){
-		JSONObject obj = new JSONObject();
-		obj.put("type", "TASK_INFO");
-		obj.put("content", taskInfoStr);
-		return toJSONString(obj);
-	}
-	
-	/*
-	 * 获取Hello消息的Json字符串
-	 */
-	public static String getHelloMsgJsonStr(String ip){
-		JSONObject json = new JSONObject();
-		json.put("ip", ip);
-		json.put("type", "HELLO");
-		json.put("content", null);
-		return toJSONString(json);
 	}
 }

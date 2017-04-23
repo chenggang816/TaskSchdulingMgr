@@ -1,1 +1,1 @@
-{"task1":"NotExist","task2":"NotExist","任务-3.0":"NotExist"}
+{"task1":{"version-manager":"0.1","version-worker":"-1"},"task2":{"version-manager":"0.1","version-worker":"-1"},"任务-3.0":{"version-manager":"0.1","version-worker":"-1"}}

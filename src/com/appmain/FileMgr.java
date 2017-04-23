@@ -25,6 +25,13 @@ public class FileMgr {
 	public static File getTaskDir(){
 		return FileHelper.getDir(getDataDir(),"task");
 	}
+	
+	/*
+	 * 获取任务配置文件
+	 */
+	public static File getTaskConfigFile(File taskDir){
+		return new File(taskDir,"task.conf");
+	}
 
 	/*
 	 * 获取config文件夹
@@ -39,12 +46,23 @@ public class FileMgr {
 		return FileHelper.getFile(getConfigDir(),"app.conf");
 	}
 
+	/*
+	 * 获取client文件夹
+	 */
 	public static File getClientDir(){
 		return FileHelper.getDir(getDataDir(),"client");
 	}
-	
-	public static File getClientFile(String ip,String port) {
+	/*
+	 * 获取client夹下的文件
+	 */
+	public static File getClientFile(String ip,int port) {
+		return getClientFile(ip,String.valueOf(port),false);
+	}
+	/*
+	 * 获取client夹下的文件
+	 */
+	public static File getClientFile(String ip,String port, boolean createNew) {
 		String fileName = ip + "-" + port;
-		return FileHelper.getFile(getClientDir(), fileName);
+		return FileHelper.getFile(getClientDir(), fileName, createNew);
 	}
 }

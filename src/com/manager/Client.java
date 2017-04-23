@@ -1,6 +1,7 @@
 package com.manager;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -77,5 +78,8 @@ public class Client {
 			} 
 		}
 		return null;
+	}
+	public void sendFile(File file) {
+		
 	}
 }

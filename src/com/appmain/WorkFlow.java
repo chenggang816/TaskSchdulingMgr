@@ -26,11 +26,12 @@ import com.manager.msg.MsgCreator;
 import com.manager.msg.MsgHandler;
 import com.manager.msg.MsgHandlerFactory;
 import com.tools.FileHelper;
+import com.tools.JSONHelper;
 import com.tools.NetHelper;
 
 public class WorkFlow {
 	List<IpPortPair> ipPortPairList = new ArrayList<IpPortPair>();
-	Map<IpPortPair, Client> serviceStateMap;
+	Map<IpPortPair, Client> mapIppClient;
 	final DefaultTableModel model = new DefaultTableModel(new String[]{"序号","IP","端口号","主机名","服务是否开启","任务更新"},0){
 		public boolean isCellEditable(int r,int c){
 			return true;
@@ -99,9 +100,9 @@ public class WorkFlow {
 	 * 测试服务是否开启
 	 */
 	public void doTestService(){
-		serviceStateMap = SocketHelper.tryCommunicate(ipPortPairList);
+		mapIppClient = SocketHelper.tryCommunicate(ipPortPairList);
 		for(int i = 0;i < ipPortPairList.size();i++){
-			String r = serviceStateMap.get(ipPortPairList.get(i)) == null ? "否" : "是";
+			String r = mapIppClient.get(ipPortPairList.get(i)) == null ? "否" : "是";
 			model.setValueAt(r, i, 4);
 		}
 	}
@@ -130,13 +131,15 @@ public class WorkFlow {
 		for(int i = 0; i < ippList.size(); i++){
 			IpPortPair ipp = ippList.get(i);
 			//将taskStr发送到各个Server主机，由各个主机返回任务更新状态
-			if(serviceStateMap == null){
+			if(mapIppClient == null){
 				System.out.println("服务开启状态未知，请先获取服务开启状态");
 				return states;
 			}
-			Client client = serviceStateMap.get(ipp);
+			Client client = mapIppClient.get(ipp);
 			if(client != null){
+				//将全部任务的列表发给worker端，worker端应返回任务的版本信息
 				String taskInfoReply = client.send(MsgCreator.createTaskInfoMsg(tasksStr));
+				//对返回的信息进行处理，将任务版本信息写入data/client文件夹内的文件里，同时返回是否需要更新的信息
 				MsgHandler handler = MsgHandlerFactory.getMsgHandler(taskInfoReply);
 				states[i] = Boolean.parseBoolean(handler.handle());
 			}
@@ -148,7 +151,57 @@ public class WorkFlow {
 	 * 任务更新
 	 */
 	public void doTaskUpdate(){
-		
+		if(ipPortPairList.size() > 0 && model.getValueAt(0, 5).toString().equals("未知")){
+			doCheckTaskUpdate();
+		}
+		//获取需要更新的主机Ip与Port，读取文件内容，找出需要更新的任务，与Worker端通信进行更新
+		for(int i = 0; i < ipPortPairList.size(); i++){
+			if(model.getValueAt(i, 5).toString().equals("需要更新")){
+				IpPortPair ipp = ipPortPairList.get(i); //需要更新的ip port
+				Client client = mapIppClient.get(ipp);
+				
+				File taskInfoFile = FileMgr.getClientFile(ipp.getIp(), ipp.getPort());
+				if(taskInfoFile == null) continue; //file为client文件下的文件
+				
+				JSONObject obj = JSONHelper.parse(FileHelper.ReadAllFromFile(taskInfoFile));
+				if(obj == null) continue; //obj为文件内的字符串解析出来的json对象
+				for(Object o:obj.keySet()){ 
+					String taskName = (String)o;
+					JSONObject taskDetail = (JSONObject)obj.get(o);
+					String workerVersion = (String)taskDetail.get("version-worker");
+					String managerVersion = (String)taskDetail.get("version-manager");
+					if(TaskInfo.VersionCompare(managerVersion, workerVersion) != 0){
+						//开始更新任务，遍历任务文件夹，每找到一个文件或一个空文件夹，向worker发送一次信息
+						File theTaskDir = new File(FileMgr.getTaskDir(),taskName);
+						updateTask(client, theTaskDir);
+					}
+				}
+//				model.setValueAt("已最新",i, 5);
+			}
+		}
+	}
+	
+	private void updateTask(Client client, File dir) {
+		File[] files = dir.listFiles();
+		String taskPath = FileMgr.getTaskDir().getAbsolutePath();
+		if(files.length <= 0){
+			String dirRelativePath = dir.getAbsolutePath().substring(taskPath.length());
+			client.send(MsgCreator.createTaskUpdateMsg(dirRelativePath, true));
+			return;
+		}
+		for(File file:files){
+			if(file.isFile()){
+				//将要发送的文件名称、文件相对路径发送给worker(考虑空文件夹的情况)
+				String filePath = file.getAbsolutePath();
+				String fileRelativePath = filePath.substring(taskPath.length());
+				String strMsg = MsgCreator.createTaskUpdateMsg(fileRelativePath,false);
+				client.send(strMsg);
+				//传输文件给worker
+				client.sendFile(file);
+			}else if(file.isDirectory()){
+				updateTask(client, file);		//对dir下所有的文件夹递归调用此方法
+			}
+		}
 	}
 	
 	/*
