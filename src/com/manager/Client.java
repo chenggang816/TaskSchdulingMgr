@@ -1,7 +1,12 @@
 package com.manager;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -47,7 +52,7 @@ public class Client {
 		}
 	}
 	
-	public String send(String strMsg){
+	public String send(String strMsg,boolean waitForReply){
 		if(!connect())
 			return null;
 		PrintWriter out = null;
@@ -57,14 +62,19 @@ public class Client {
 			out.println(strMsg);
 			socket.shutdownOutput();
 			
-			//写完以后进行读操作  
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			String line ;
-			while((line= in.readLine()) != null){
-				System.out.println("Server:" + line);
-				return line;
-			}	
-			
+			if(waitForReply){
+				//写完以后进行读操作  
+				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				StringBuilder msg = new StringBuilder();
+				String line ;
+				while((line= in.readLine()) != null){
+					System.out.println("From Worker:" + line);
+					msg.append(line);
+					msg.append("\n");
+				}
+				msg.deleteCharAt(msg.length() - 1);
+				return msg.toString();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("异常主机ip:" + host);
@@ -79,7 +89,37 @@ public class Client {
 		}
 		return null;
 	}
+	
+	public String send(String strMsg){
+		return send(strMsg, true);
+	}
 	public void sendFile(File file) {
-		
+		DataInputStream dis = null;
+		DataOutputStream dos = null;
+		connect();
+		try {
+			if(file == null) throw new IOException("文件为null");
+			dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+			dos = new DataOutputStream(socket.getOutputStream());
+			dos.writeLong(file.length());
+			dos.flush();
+			byte[] buffer = new byte[1024];
+			int read;
+			while((read = dis.read(buffer)) != -1){
+				dos.write(buffer,0,read);
+				dos.flush();
+			}
+			socket.shutdownOutput();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally{
+			try {
+				dis.close();
+				dos.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			close();
+		}
 	}
 }

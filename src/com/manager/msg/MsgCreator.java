@@ -2,6 +2,7 @@ package com.manager.msg;
 
 import static com.tools.JSONHelper.toJSONString;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 
@@ -38,5 +39,8 @@ public class MsgCreator {
 		content.put("isDir", isDir);
 		content.put("path", relativePath);
 		return createMsg(new Object[]{"TASK_UPDATE",content});
+	}
+	public static String createTaskClearMsg(File theTaskDir) {
+		return createMsg(new Object[]{"TASK_CLEAR",theTaskDir.getName()});
 	}
 }

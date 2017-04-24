@@ -173,6 +173,7 @@ public class WorkFlow {
 					if(TaskInfo.VersionCompare(managerVersion, workerVersion) != 0){
 						//开始更新任务，遍历任务文件夹，每找到一个文件或一个空文件夹，向worker发送一次信息
 						File theTaskDir = new File(FileMgr.getTaskDir(),taskName);
+						clearTask(client,theTaskDir);
 						updateTask(client, theTaskDir);
 					}
 				}
@@ -181,12 +182,17 @@ public class WorkFlow {
 		}
 	}
 	
+	private void clearTask(Client client, File theTaskDir) {
+		String strMsg = MsgCreator.createTaskClearMsg(theTaskDir);
+		client.send(strMsg,false);
+	}
+
 	private void updateTask(Client client, File dir) {
 		File[] files = dir.listFiles();
 		String taskPath = FileMgr.getTaskDir().getAbsolutePath();
 		if(files.length <= 0){
 			String dirRelativePath = dir.getAbsolutePath().substring(taskPath.length());
-			client.send(MsgCreator.createTaskUpdateMsg(dirRelativePath, true));
+			client.send(MsgCreator.createTaskUpdateMsg(dirRelativePath, true),false);
 			return;
 		}
 		for(File file:files){
@@ -195,13 +201,14 @@ public class WorkFlow {
 				String filePath = file.getAbsolutePath();
 				String fileRelativePath = filePath.substring(taskPath.length());
 				String strMsg = MsgCreator.createTaskUpdateMsg(fileRelativePath,false);
-				client.send(strMsg);
+				client.send(strMsg,false);
 				//传输文件给worker
 				client.sendFile(file);
 			}else if(file.isDirectory()){
 				updateTask(client, file);		//对dir下所有的文件夹递归调用此方法
 			}
 		}
+		doCheckTaskUpdate(); //更新完之后再检查一遍，同时更新表格内容
 	}
 	
 	/*

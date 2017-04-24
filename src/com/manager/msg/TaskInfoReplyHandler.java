@@ -36,12 +36,12 @@ public class TaskInfoReplyHandler extends MsgHandler{
 		for(Object taskName:mapTaskNameInfo.keySet()){
 			JSONObject taskDetail = (JSONObject)mapTaskNameInfo.get(taskName);
 			String workerVersion = (String)taskDetail.get("version-worker");
-			String serverVersion = (String)taskDetail.get("version-server");
+			String managerVersion = (String)taskDetail.get("version-manager");
 			if(workerVersion.equalsIgnoreCase("-1") || workerVersion.equalsIgnoreCase("-2")){
 				isUpdated = false;
 				break;
 			}
-			if(TaskInfo.VersionCompare(serverVersion, workerVersion) != 0){
+			if(TaskInfo.VersionCompare(managerVersion, workerVersion) != 0){
 				isUpdated = false;
 				break;
 			}
