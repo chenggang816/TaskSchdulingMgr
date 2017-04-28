@@ -5,8 +5,8 @@ import java.io.File;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import com.appmain.FileMgr;
-import com.appmain.TaskInfo;
+import com.manager.main.TaskInfo;
+import com.manager.tools.FileMgr;
 import com.tools.FileHelper;
 import com.tools.JSONHelper;
 

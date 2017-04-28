@@ -1,4 +1,4 @@
-package com.appmain;
+package com.manager.main;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,16 +20,18 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.manager.Client;
-import com.manager.SocketHelper;
 import com.manager.msg.MsgCreator;
 import com.manager.msg.MsgHandler;
 import com.manager.msg.MsgHandlerFactory;
+import com.manager.net.Client;
+import com.manager.net.SocketHelper;
+import com.manager.tools.FileMgr;
+import com.manager.tools.JSONMgr;
 import com.tools.FileHelper;
 import com.tools.JSONHelper;
 import com.tools.NetHelper;
 
-public class WorkFlow {
+public class WorkFlowMain {
 	List<IpPortPair> ipPortPairList = new ArrayList<IpPortPair>();
 	Map<IpPortPair, Client> mapIppClient;
 	final DefaultTableModel model = new DefaultTableModel(new String[]{"序号","IP","端口号","主机名","服务是否开启","任务更新"},0){
@@ -45,6 +47,17 @@ public class WorkFlow {
 		doLoadHostsFromConfig();
 		doTestService();
 //		doCheckTaskUpdate();
+	}
+	
+	private WorkFlowMain(){}
+	private static WorkFlowMain workFlow;
+	public static WorkFlowMain getWorkFlow(){
+		if(workFlow == null)  workFlow = new WorkFlowMain();
+		return workFlow;
+	}
+	
+	public Map<IpPortPair, Client> getMapIppClient(){
+		return mapIppClient;
 	}
 	
 	public boolean canWork(){

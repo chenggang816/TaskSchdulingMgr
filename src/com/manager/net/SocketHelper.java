@@ -1,4 +1,4 @@
-package com.manager;
+package com.manager.net;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.appmain.IpPortPair;
+import com.manager.main.IpPortPair;
 import com.manager.msg.MsgCreator;
 import com.manager.msg.MsgHandler;
 import com.manager.msg.MsgHandlerFactory;

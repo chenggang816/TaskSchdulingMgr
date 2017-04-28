@@ -1,4 +1,4 @@
-package com.appmain;
+package com.manager.tools;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.manager.main.TaskInfo;
 import com.tools.FileHelper;
 import com.tools.JSONHelper;
 

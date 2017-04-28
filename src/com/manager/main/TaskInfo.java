@@ -1,4 +1,4 @@
-package com.appmain;
+package com.manager.main;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

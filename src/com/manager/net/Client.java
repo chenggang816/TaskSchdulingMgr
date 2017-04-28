@@ -1,4 +1,4 @@
-package com.manager;
+package com.manager.net;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -19,8 +19,8 @@ import java.net.UnknownHostException;
 
 import org.json.simple.JSONObject;
 
-import com.appmain.JSONMgr;
 import com.manager.msg.MsgCreator;
+import com.manager.tools.JSONMgr;
 
 public class Client {
 	Socket socket = null;

@@ -1,4 +1,4 @@
-package com.appmain;
+package com.manager.ui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -18,19 +18,21 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import com.manager.SocketHelper;
+import com.manager.main.WorkFlowMain;
+import com.manager.net.SocketHelper;
 import com.tools.NetHelper;
 
 public class FrameMain extends JFrame{
 	JMenuBar menuBar;
-	JMenu menuFile;
+	JMenu menuFile,menuTask;
 	JMenuItem menuItemLoadConfigFile,menuItemEditConfigFile,menuItemViewConfigFile;
+	JMenuItem menuItemTestTask;
 	JButton btnGainAllIp,btnGainHostNames;
 	JButton btnTestService,btnCheckTaskUpdate,btnTaskUpdate;
 	JPanel panelTop;
 	JTable table;
 	
-	WorkFlow workFlow = new WorkFlow();
+	WorkFlowMain workFlow = WorkFlowMain.getWorkFlow();
 
 	public FrameMain() {
 		initialize();
@@ -120,7 +122,9 @@ public class FrameMain extends JFrame{
 		
 		menuBar = new JMenuBar();
 		menuFile = new JMenu("文件");
+		menuTask = new JMenu("任务");
 		menuBar.add(menuFile);
+		menuBar.add(menuTask);
 		
 		menuItemLoadConfigFile = new JMenuItem("从配置文件中加载主机");
 		menuFile.add(menuItemLoadConfigFile);
@@ -146,6 +150,16 @@ public class FrameMain extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e){
 				workFlow.doViewConfigFile();
+			}
+		});
+		
+		
+		menuItemTestTask = new JMenuItem("任务运行测试");
+		menuTask.add(menuItemTestTask);
+		menuItemTestTask.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new FrameTestTask();
 			}
 		});
 		

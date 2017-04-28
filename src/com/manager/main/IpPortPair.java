@@ -1,4 +1,4 @@
-package com.appmain;
+package com.manager.main;
 
 import java.util.ArrayList;
 import java.util.Arrays;
